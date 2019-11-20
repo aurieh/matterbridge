@@ -185,6 +185,8 @@ func (b *Bdiscord) JoinChannel(channel config.ChannelInfo) error {
 	return nil
 }
 
+var mentionReplacer = strings.NewReplacer("@", "@\u200B")
+
 func (b *Bdiscord) Send(msg config.Message) (string, error) {
 	b.Log.Debugf("=> Receiving %#v", msg)
 
@@ -201,10 +203,9 @@ func (b *Bdiscord) Send(msg config.Message) (string, error) {
 		return "", nil
 	}
 
-	// strip @everyone/@here
+	// strip ats
 	if b.GetBool("StripMassMentions") {
-		re := regexp.MustCompile("@(everyone|here)")
-		msg.Text = re.ReplaceAllString(msg.Text, "@\u200B$1")
+		msg.Text = mentionReplacer.Replace(msg.Text)
 	}
 
 	// Make a action /me of the message
