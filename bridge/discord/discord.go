@@ -201,6 +201,12 @@ func (b *Bdiscord) Send(msg config.Message) (string, error) {
 		return "", nil
 	}
 
+	// strip @everyone/@here
+	if b.GetBool("StripMassMentions") {
+		re := regexp.MustCompile("@(everyone|here)")
+		msg.Text = re.ReplaceAllString(msg.Text, "@\u200B$1")
+	}
+
 	// Make a action /me of the message
 	if msg.Event == config.EventUserAction {
 		msg.Text = "_" + msg.Text + "_"
